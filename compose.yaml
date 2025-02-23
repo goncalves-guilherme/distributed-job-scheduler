@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_DATABASE=jobschedulerdb
+    ports:
+      - "27017:27017"
+    tmpfs:
+      - /data/db
+    networks:
+      - mongo-network
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    environment:
+      - ME_CONFIG_MONGODB_URL=mongodb://mongo:27017/jobschedulerdb
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+    ports:
+      - "8081:8081"
+    networks:
+      - mongo-network
+    depends_on:
+      - mongo
+
+networks:
+  mongo-network:
+    driver: bridge
