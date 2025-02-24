@@ -90,7 +90,11 @@ public final class JobService extends BaseService implements IJobService {
 
     @Override
     public Page<Job> searchJobs(int page, int pageSize, QueryParameters queryParameters) throws ValidationException {
-        ensureValidPage(page, pageSize);
+        var errors = Page.validate(page, pageSize);
+
+        if(!errors.isEmpty()) {
+            throw new ValidationException(errors);
+        }
 
         return executeWithErrorHandler(() -> jobRepository.getPage(page, pageSize, queryParameters));
     }
@@ -106,20 +110,5 @@ public final class JobService extends BaseService implements IJobService {
             throw new ValidationException(List.of(errorMessage));
         }
         return job;
-    }
-
-    private static void ensureValidPage(int page, int pageSize) throws ValidationException {
-        List<String> errors  = new ArrayList<>();
-
-        if(page <= 0) {
-            errors.add(ErrorMessages.JOB_PAGE_NUMBER_INVALID);
-        }
-        if(pageSize <= 0) {
-            errors.add(ErrorMessages.JOB_PAGE_SIZE_INVALID);
-        }
-
-        if (!errors.isEmpty()) {
-            throw new ValidationException(errors);
-        }
     }
 }

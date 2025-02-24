@@ -1,5 +1,7 @@
 package com.gcg.djs.domain.common;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -26,11 +28,10 @@ public record Page<T>(int page, int pageSize, long totalItems, Iterable<T> items
      * if the page number is less than 1. Also ensures the items list is non-null.
      */
     public Page {
-        if (pageSize <= 0) {
-            throw new IllegalArgumentException("Page size must be greater than zero.");
-        }
-        if (page < 1) {
-            throw new IllegalArgumentException("Page number must be greater than zero.");
+        var errors = validate(page, pageSize);
+
+        if(!errors.isEmpty()) {
+            throw new IllegalArgumentException(String.join(",", errors));
         }
 
         Objects.requireNonNull(items);
@@ -46,5 +47,18 @@ public record Page<T>(int page, int pageSize, long totalItems, Iterable<T> items
      */
     public int totalPages() {
         return (int) Math.ceil((double) totalItems / pageSize);
+    }
+
+    public static List<String> validate(int page, int pageSize) {
+        List<String> errors  = new ArrayList<>();
+
+        if(page <= 0) {
+            errors.add(ErrorMessages.PAGE_NUMBER_INVALID);
+        }
+        if(pageSize <= 0) {
+            errors.add(ErrorMessages.PAGE_SIZE_INVALID);
+        }
+
+        return errors;
     }
 }
