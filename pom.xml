@@ -84,7 +84,7 @@
 		<dependency>
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java</artifactId>
-			<version>4.28.2</version>
+			<version>3.11.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mongodb</groupId>
@@ -145,19 +145,31 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
 			<plugin>
-				<groupId>org.xolstice.maven.plugins</groupId>
-				<artifactId>protobuf-maven-plugin</artifactId>
-				<version>0.6.1</version>
-				<configuration>
-					<protocArtifact>com.google.protobuf:protoc:4.28.2:exe</protocArtifact>
-				</configuration>
+				<groupId>com.github.os72</groupId>
+				<artifactId>protoc-jar-maven-plugin</artifactId>
+				<version>3.11.4</version>
 				<executions>
 					<execution>
+						<phase>generate-sources</phase>
 						<goals>
-							<goal>compile</goal>
-							<goal>test-compile</goal>
+							<goal>run</goal>
 						</goals>
+						<configuration>
+							<inputDirectories>
+								<include>${project.basedir}/src/main/java/com/gcg/djs/infrastructure/kafka/protobuf</include>
+							</inputDirectories>
+							<outputTargets>
+								<outputTarget>
+									<type>java</type>
+									<addSources>main</addSources>
+									<outputDirectory>
+										${project.basedir}/target/generated-sources/protobuf
+									</outputDirectory>
+								</outputTarget>
+							</outputTargets>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

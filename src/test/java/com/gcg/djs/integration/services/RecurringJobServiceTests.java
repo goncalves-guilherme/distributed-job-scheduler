@@ -203,4 +203,159 @@ public class RecurringJobServiceTests {
         assertEquals(1, actualResult.totalPages());
         assertIterableEquals(expectedJobs, actualResult.items());
     }
+
+    @Test
+    public void getNextRun_ValidPageAndSize_ReturnsPageWithJobs() throws ValidationException {
+        // Arrange
+        List<RecurringJob> jobs = new ArrayList<>();
+        List<RecurringJob> jobsToRun = new ArrayList<>();
+
+        for (int i = 1; i <= 10; i++) {
+            var nextExecution = Instant.now().plusSeconds(60 * 60 * (i + 1));
+
+            if(i % 2 == 0) {
+                nextExecution = Instant.now().minusSeconds(60 * 60 * (i + 1));
+            }
+
+            var job = new RecurringJob(
+                    UUID.randomUUID(),
+                    "0 0 * * *",
+                    "Test Recurring Job " + i + " - " + TEST_MARK,
+                    "Test Recurring Job description " + i,
+                    Instant.now().minusSeconds(60 * 60 * (i + 1)), // nextRun in the past
+                    Instant.now().minusSeconds(60 * 60 * (i + 1)),
+                    true,
+                    nextExecution,
+                    null
+            );
+
+            jobs.add(job);
+
+            if(i % 2 == 0) {
+                jobsToRun.add(job);
+            }
+        }
+
+        this.mongoDatabase
+                .getCollection("recurringJobs")
+                .insertMany(jobs.stream().map(RecurringJobTestUtils::recurringJobToDocument).toList());
+
+        var page = 1;
+        var pageSize = jobsToRun.size();
+
+        // Act
+        var actualResult = this.recurringJobService.getNextRun(page, pageSize);
+
+        // Assert
+        assertEquals(page, actualResult.page());
+        assertEquals(1, actualResult.totalPages());
+        assertEquals(pageSize, actualResult.totalItems());
+        assertTrue(actualResult.items().stream().allMatch(job -> job.nextRun().isBefore(Instant.now())));
+    }
+
+    @Test
+    public void getNextRun_InvalidPage_ThrowsValidationException() {
+        // Act & Assert
+        assertThrows(ValidationException.class, () -> this.recurringJobService.getNextRun(0, 10));
+        assertThrows(ValidationException.class, () -> this.recurringJobService.getNextRun(-1, 10));
+    }
+
+    @Test
+    public void getNextRun_InvalidPageSize_ThrowsValidationException() {
+        // Act & Assert
+        assertThrows(ValidationException.class, () -> this.recurringJobService.getNextRun(1, -5));
+        assertThrows(ValidationException.class, () -> this.recurringJobService.getNextRun(1, 0));
+    }
+
+    @Test
+    public void getNextRun_NoJobsAvailable_ReturnsEmptyPage() throws ValidationException {
+        // Arrange
+        var page = 1;
+        var pageSize = 10;
+
+        // Act
+        var actualResult = this.recurringJobService.getNextRun(page, pageSize);
+
+        // Assert
+        assertEquals(page, actualResult.page());
+        assertEquals(0, actualResult.totalItems()); // No jobs in the database
+        assertEquals(0, actualResult.items().size()); // No jobs on the page
+    }
+
+    @Test
+    public void pauseJob_ExistingJob_JobIsPaused() throws ValidationException {
+        // Arrange
+        // Insert a recurring job with active status = true
+        UUID jobId = UUID.randomUUID();
+        var job = new RecurringJob(
+                jobId,
+                "0 0 * * *",
+                "Test Recurring Job 1 - " + TEST_MARK,
+                "Test Recurring Job description 1",
+                Instant.now().minusSeconds(3600),
+                Instant.now(),
+                true,
+                Instant.now().plusSeconds(3600),
+                null
+        );
+
+        this.mongoDatabase
+                .getCollection("recurringJobs")
+                .insertOne(recurringJobToDocument(job));
+
+        // Act
+        boolean result = this.recurringJobService.pauseJob(jobId);
+
+        // Assert
+        assertTrue(result);
+        RecurringJob pausedJob = this.recurringJobService.getRecurringJobById(jobId);
+        assertFalse(pausedJob.active());
+    }
+
+    @Test
+    public void pauseJob_NonExistingJob_ThrowsValidationException() {
+        // Arrange
+        UUID nonExistingJobId = UUID.randomUUID();
+
+        // Act & Assert
+        assertThrows(ValidationException.class, () -> this.recurringJobService.pauseJob(nonExistingJobId));
+    }
+
+    @Test
+    public void pauseJob_JobAlreadyPaused_StillReturnsTrue() throws ValidationException {
+        // Arrange
+        UUID jobId = UUID.randomUUID();
+        var job = new RecurringJob(
+                jobId,
+                "0 0 * * *",
+                "Test Recurring Job 1 - " + TEST_MARK,
+                "Test Recurring Job description 1",
+                Instant.now().minusSeconds(3600),
+                Instant.now(),
+                false,
+                Instant.now().plusSeconds(3600),
+                null
+        );
+
+        this.mongoDatabase
+                .getCollection("recurringJobs")
+                .insertOne(recurringJobToDocument(job));
+
+        // Act
+        boolean result = this.recurringJobService.pauseJob(jobId);
+
+        // Assert
+        assertTrue(result); // The method should return true, as the job is already paused
+        RecurringJob pausedJob = this.recurringJobService.getRecurringJobById(jobId);
+        assertFalse(pausedJob.active()); // The job should remain paused
+    }
+
+    @Test
+    public void pauseJob_InvalidJobId_ThrowsValidationException() {
+        // Arrange
+        UUID invalidJobId = UUID.randomUUID();
+
+        // Act & Assert
+        assertThrows(ValidationException.class, () -> this.recurringJobService.pauseJob(invalidJobId));
+    }
 }

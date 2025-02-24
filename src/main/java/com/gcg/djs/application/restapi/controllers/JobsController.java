@@ -68,24 +68,20 @@ public class JobsController {
         }
     }
 
-//    @GetMapping
-//    public ResponseEntity<Page<Job>> searchJobs(
-//            @RequestParam(defaultValue = "1") int page,
-//            @RequestParam(defaultValue = "10") int pageSize,
-//            @RequestParam(required = false) String queryParams) {
-//
-//        try {
-//
-//            QueryParameters queryParameters = null;
-//            if (queryParams != null && !queryParams.isEmpty()) {
-//                queryParameters = QueryParameters.fromString(queryParams);
-//            }
-//
-//            Page<Job> jobs = jobService.searchJobs(page, pageSize, queryParameters);
-//            return new ResponseEntity<>(jobs, HttpStatus.OK);
-//
-//        } catch (ValidationException e) {
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//    }
+    @GetMapping
+    public ResponseEntity<Page<Job>> searchJobs(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String queryParams) {
+
+        try {
+
+            // TODO build a string parser to queryParameters
+            Page<Job> jobs = jobService.searchJobs(page, pageSize, null);
+            return new ResponseEntity<>(jobs, HttpStatus.OK);
+
+        } catch (ValidationException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
 }

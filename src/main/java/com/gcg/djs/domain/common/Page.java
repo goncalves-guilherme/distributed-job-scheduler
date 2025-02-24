@@ -20,7 +20,7 @@ import java.util.Objects;
  * @param totalItems The total number of items across all pages.
  * @param items The items on the current page.
  */
-public record Page<T>(int page, int pageSize, long totalItems, Iterable<T> items) {
+public record Page<T>(int page, int pageSize, long totalItems, List<T> items) {
 
     /**
      * Constructor that validates the page size and page number.

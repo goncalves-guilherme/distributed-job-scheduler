@@ -114,7 +114,7 @@ public class RecurringJobService extends BaseService implements IRecurringJobSer
                 recurringJob.name(),
                 recurringJob.description(),
                 recurringJob.createdDate(),
-                recurringJob.modifiedDate(),
+                Instant.now(),
                 false,
                 recurringJob.nextRun(),
                 recurringJob.lastRun()

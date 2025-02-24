@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package com.gcg.djs.infrastructure.kafka;
+
+message Job {
+    string id = 1;
+    string binLocation = 2;
+}
