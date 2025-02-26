@@ -1,6 +1,7 @@
 package com.gcg.djs.domain.common;
 
 import com.gcg.djs.domain.common.filters.*;
+import org.bson.conversions.Bson;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -16,15 +17,16 @@ public class QueryBuilderTests {
 
         var filters = List.of(
                 new LogicalFilter(LogicalOperator.OR),
-                new NumberFilter("a", ComparisonOperator.EQUAL, 5),
+                new NumberFilter(ComparisonOperator.EQUAL, "a", 5),
                 new LogicalFilter(LogicalOperator.AND),
-                new NumberFilter("a", ComparisonOperator.GREATER_THAN, 10),
-                new InstantFilter("a", ComparisonOperator.GREATER_THAN, instant)
+                new NumberFilter(ComparisonOperator.GREATER_THAN, "a", 10),
+                new InstantFilter(ComparisonOperator.GREATER_THAN, "a", instant),
+                new StringFilter(StringOperator.LIKE, "str", "random")
         );
 
         var queryParameters = new QueryParameters(filters, List.of());
 
-        var expectedFilter = "a>" + instant.toString() + "&a>10||a==5";
+        var expectedFilter = "strLIKErandom&a>" + instant.toString() + "&a>10||a==5";
 
         // Act
         var actual = QueryBuilder.buildQuery(queryParameters, FilterConverterMock.instance);
@@ -55,6 +57,11 @@ public class QueryBuilderTests {
         public String convertLogical(LogicalFilter logicalFilter, List<String> filters) {
             String operator = logicalFilter.getOperator().toString();
             return String.join(operator, filters);
+        }
+
+        @Override
+        public String convertString(StringFilter stringFilter) {
+            return stringFilter.getFieldName() + stringFilter.getOperator() + stringFilter.getValue();
         }
     }
 }

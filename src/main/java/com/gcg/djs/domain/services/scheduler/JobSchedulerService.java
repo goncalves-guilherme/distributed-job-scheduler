@@ -1,5 +1,7 @@
 package com.gcg.djs.domain.services.scheduler;
 
+import com.gcg.djs.domain.common.QueryParameters;
+import com.gcg.djs.domain.common.QueryParametersBuilder;
 import com.gcg.djs.domain.interfaces.external.IMessageQueue;
 import com.gcg.djs.domain.interfaces.repositories.Repository;
 import com.gcg.djs.domain.interfaces.services.IJobSchedulerService;
@@ -53,7 +55,13 @@ public final class JobSchedulerService implements IJobSchedulerService {
         this.jobMessageQueue = jobMessageQueue;
     }
 
-    public void enqueueJobs() throws ValidationException {
+    public void enqueueNextJobsPage() {
+
+//        var queryParameters = new QueryParametersBuilder()
+//                .or()
+//                .equal("status", JobStatus.CREATED.toString())
+//                .lessThan("retries", 5)
+//                .build();
 
     }
 

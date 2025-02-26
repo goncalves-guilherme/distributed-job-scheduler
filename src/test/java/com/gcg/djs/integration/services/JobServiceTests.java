@@ -305,8 +305,8 @@ public class JobServiceTests {
 
         var queryParameters = new QueryParameters(
                 List.of(new LogicalFilter(LogicalOperator.AND),
-                        new NumberFilter("retries", ComparisonOperator.GREATER_THAN, 3),
-                        new InstantFilter("createdDate", ComparisonOperator.LESS_THAN, Instant.now())),
+                        new NumberFilter(ComparisonOperator.GREATER_THAN, "retries", 3),
+                        new InstantFilter(ComparisonOperator.LESS_THAN, "createdDate", Instant.now())),
                 List.of());
 
         // Act

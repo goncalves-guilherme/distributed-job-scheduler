@@ -3,6 +3,7 @@ package com.gcg.djs.domain.common;
 import com.gcg.djs.domain.common.filters.ComparisonFilter;
 import com.gcg.djs.domain.common.filters.Filter;
 import com.gcg.djs.domain.common.filters.LogicalFilter;
+import com.gcg.djs.domain.common.filters.StringFilter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,11 @@ public final class QueryBuilder {
             } else if (filter instanceof ComparisonFilter<?> comparisonFilter) {
                 T comparisonQuery = filterConverter.convertComparison(comparisonFilter);
                 filters.add(comparisonQuery);
-            } else {
+            } else if (filter instanceof StringFilter stringFilter) {
+                T stringQuery = filterConverter.convertString(stringFilter);
+                filters.add(stringQuery);
+            }
+            else {
                 throw new RuntimeException("Unexpected filter type.");
             }
         }

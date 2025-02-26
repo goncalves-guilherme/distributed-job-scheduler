@@ -191,7 +191,7 @@ public class RecurringJobServiceTests {
 
         var queryParameters = new QueryParameters(
                 List.of(new LogicalFilter(LogicalOperator.AND),
-                        new InstantFilter("createdDate", ComparisonOperator.LESS_THAN, Instant.now())),
+                        new InstantFilter(ComparisonOperator.LESS_THAN, "createdDate", Instant.now())),
                 List.of());
 
         // Act

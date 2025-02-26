@@ -57,6 +57,7 @@ public class QueryParameterBuilderTests {
                         .lessThan("age3", 15)
                         .greaterThanOrEqual("age4", 20)
                         .lessThanOrEqual("age5", 25)
+                        .like("stringField", "test")
                 .sortByAsc("age")
                 .sortByDesc("test");
 
@@ -65,7 +66,7 @@ public class QueryParameterBuilderTests {
 
         // Assert
         assertNotNull(actual);
-        assertEquals(13, actual.filters().size());
+        assertEquals(14, actual.filters().size());
 
         assertLogicalFilter(actual.filters().get(0), LogicalOperator.AND);
 
@@ -82,6 +83,7 @@ public class QueryParameterBuilderTests {
         assertNumberFilter(actual.filters().get(10), "age3", ComparisonOperator.LESS_THAN, 15);
         assertNumberFilter(actual.filters().get(11), "age4", ComparisonOperator.GREATER_THAN_OR_EQUAL, 20);
         assertNumberFilter(actual.filters().get(12), "age5", ComparisonOperator.LESS_THAN_OR_EQUAL, 25);
+        assertStringFilter(actual.filters().get(13), "stringField", StringOperator.LIKE, "test");
 
         assertEquals(2, actual.sorts().size());
 
@@ -115,5 +117,15 @@ public class QueryParameterBuilderTests {
         assertEquals(expectedField, numberFilter.getFieldName());
         assertEquals(expectedOperator, numberFilter.getOperator());
         assertEquals(numberFilter.getValue(), expectValue);
+    }
+
+    private static void assertStringFilter(
+            Filter filter, String expectedField, StringOperator expectedOperator, String expectValue) {
+
+        assertInstanceOf(StringFilter.class, filter);
+        StringFilter stringFilter = (StringFilter) filter;
+        assertEquals(expectedField, stringFilter.getFieldName());
+        assertEquals(expectedOperator, stringFilter.getOperator());
+        assertEquals(stringFilter.getValue(), expectValue);
     }
 }

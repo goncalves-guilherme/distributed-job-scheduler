@@ -1,10 +1,7 @@
 package com.gcg.djs.infrastructure.mongdb;
 
 import com.gcg.djs.domain.common.FilterConverter;
-import com.gcg.djs.domain.common.filters.ComparisonFilter;
-import com.gcg.djs.domain.common.filters.ComparisonOperator;
-import com.gcg.djs.domain.common.filters.LogicalFilter;
-import com.gcg.djs.domain.common.filters.LogicalOperator;
+import com.gcg.djs.domain.common.filters.*;
 import com.mongodb.client.model.Filters;
 import org.bson.conversions.Bson;
 
@@ -30,6 +27,23 @@ public final class MongoFilterConverter implements FilterConverter<Bson> {
             ComparisonOperator.LESS_THAN, Filters::lt,
             ComparisonOperator.LESS_THAN_OR_EQUAL, Filters::lte
     );
+
+    private static final Map<StringOperator, BiFunction<String, Object, Bson>> STRING_OPERATOR_MAP = Map.of(
+            StringOperator.LIKE, Filters::eq
+    );
+
+    @Override
+    public Bson convertString(StringFilter stringFilter) {
+        String fieldName = stringFilter.getFieldName();
+        StringOperator operator = stringFilter.getOperator();
+        Object value = stringFilter.getValue();
+
+        BiFunction<String, Object, Bson> filterFunction = STRING_OPERATOR_MAP.get(operator);
+        if (filterFunction == null) {
+            throw new UnsupportedOperationException("Unsupported operator: " + operator);
+        }
+        return filterFunction.apply(fieldName, value);
+    }
 
     @Override
     public Bson convertComparison(ComparisonFilter<?> comparisonFilter) {

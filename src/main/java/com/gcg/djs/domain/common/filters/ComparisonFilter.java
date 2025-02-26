@@ -9,7 +9,7 @@ public abstract sealed class ComparisonFilter<T> implements Filter permits Numbe
     private final ComparisonOperator operator;
     private final T value;
 
-    public ComparisonFilter(String fieldName, ComparisonOperator operator, T value) {
+    public ComparisonFilter(ComparisonOperator operator, String fieldName, T value) {
         this.fieldName = Objects.requireNonNull(Strings.trimToNull(fieldName));
         this.operator = Objects.requireNonNull(operator);
         this.value = Objects.requireNonNull(value);

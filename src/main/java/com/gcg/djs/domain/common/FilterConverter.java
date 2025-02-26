@@ -3,6 +3,8 @@ package com.gcg.djs.domain.common;
 import com.gcg.djs.domain.common.filters.ComparisonFilter;
 import com.gcg.djs.domain.common.filters.Filter;
 import com.gcg.djs.domain.common.filters.LogicalFilter;
+import com.gcg.djs.domain.common.filters.StringFilter;
+import org.bson.conversions.Bson;
 
 import java.util.List;
 
@@ -44,4 +46,16 @@ public interface FilterConverter<T> {
      * @return The converted filter of type {@link T} resulting from the logical operation.
      */
     T convertLogical(LogicalFilter logicalFilter, List<T> filters);
+
+    /**
+     * Converts a {@link StringFilter} to a {@link Bson} representation.
+     * <p>
+     * This method processes a string-based filter and converts it into a {@link Bson} format
+     * suitable for use in a MongoDB query or similar database operations.
+     * It handles operations such as "LIKE" or other string-based comparisons.
+     *
+     * @param stringFilter The {@link StringFilter} to be converted.
+     * @return The converted filter as a {@link Bson} instance, representing the string filter in query form.
+     */
+    T convertString(StringFilter stringFilter);
 }

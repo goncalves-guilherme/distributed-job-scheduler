@@ -21,7 +21,7 @@ public class MongoFilterConverterTests {
     public void convertComparison_equalOperator_shouldReturnEqualFilter() {
         // Arrange
         ComparisonFilter<?> comparisonFilter = new NumberFilter(
-                "FieldName", ComparisonOperator.EQUAL, 5);
+                ComparisonOperator.EQUAL, "FieldName", 5);
 
         // Act
         Bson actualBson = converter.convertComparison(comparisonFilter);
@@ -35,7 +35,7 @@ public class MongoFilterConverterTests {
     public void convertComparison_greaterThanOperator_shouldReturnGreaterThanFilter() {
         // Arrange
         ComparisonFilter<?> comparisonFilter = new NumberFilter(
-                "FieldName", ComparisonOperator.GREATER_THAN, 5);
+                ComparisonOperator.GREATER_THAN,"FieldName", 5);
 
         // Act
         Bson actualBson = converter.convertComparison(comparisonFilter);
@@ -48,7 +48,8 @@ public class MongoFilterConverterTests {
     @Test
     public void convertComparison_greaterThanOrEqualOperator_shouldReturnGreaterThanOrEqualFilter() {
         // Arrange
-        ComparisonFilter<?> comparisonFilter = new NumberFilter("FieldName", ComparisonOperator.GREATER_THAN_OR_EQUAL, 5);
+        ComparisonFilter<?> comparisonFilter = new NumberFilter(
+                ComparisonOperator.GREATER_THAN_OR_EQUAL, "FieldName", 5);
 
         // Act
         Bson actualBson = converter.convertComparison(comparisonFilter);
@@ -61,7 +62,8 @@ public class MongoFilterConverterTests {
     @Test
     public void convertComparison_lessThanOperator_shouldReturnLessThanFilter() {
         // Arrange
-        ComparisonFilter<?> comparisonFilter = new NumberFilter("FieldName", ComparisonOperator.LESS_THAN, 5);
+        ComparisonFilter<?> comparisonFilter = new NumberFilter(
+                ComparisonOperator.LESS_THAN, "FieldName", 5);
 
         // Act
         Bson actualBson = converter.convertComparison(comparisonFilter);
@@ -74,7 +76,8 @@ public class MongoFilterConverterTests {
     @Test
     public void convertComparison_lessThanOrEqualOperator_shouldReturnLessThanOrEqualFilter() {
         // Arrange
-        ComparisonFilter<?> comparisonFilter = new NumberFilter("FieldName", ComparisonOperator.LESS_THAN_OR_EQUAL, 5);
+        ComparisonFilter<?> comparisonFilter = new NumberFilter(
+                ComparisonOperator.LESS_THAN_OR_EQUAL, "FieldName", 5);
 
         // Act
         Bson actualBson = converter.convertComparison(comparisonFilter);

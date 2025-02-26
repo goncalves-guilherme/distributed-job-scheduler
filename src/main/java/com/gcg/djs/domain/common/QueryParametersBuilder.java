@@ -166,6 +166,26 @@ public final class QueryParametersBuilder {
     }
 
     /**
+     * Adds a "LIKE" filter to the query parameters for a specific field and value.
+     * <p>
+     * This method constructs a filter that checks if the specified field contains the provided value.
+     * It ensures that the field name and value are non-null before adding the filter to the list of filters.
+     *
+     * @param filedName The name of the field to apply the "LIKE" filter on. It must not be null.
+     * @param value The value to match using the "LIKE" operation. It must not be null.
+     * @return The current instance of the {@link QueryParametersBuilder} to allow method chaining.
+     *
+     * @throws NullPointerException if either the filedName or value is null.
+     */
+    public QueryParametersBuilder like(String filedName, String value) {
+        Objects.requireNonNull(filedName);
+        Objects.requireNonNull(value);
+
+        filters.add(new StringFilter(StringOperator.LIKE, filedName, value));
+        return this;
+    }
+
+    /**
      * Adds an ascending sort condition on the given field.
      *
      * @param fieldName The field to sort by.
@@ -198,9 +218,9 @@ public final class QueryParametersBuilder {
 
         Filter filter;
         if (value instanceof Number) {
-            filter = new NumberFilter(fieldName, operator, (Number) value);
+            filter = new NumberFilter(operator, fieldName, (Number) value);
         } else if (value instanceof Instant) {
-            filter = new InstantFilter(fieldName, operator, (Instant) value);
+            filter = new InstantFilter(operator, fieldName, (Instant) value);
         } else {
             throw new IllegalArgumentException("Unsupported value type: " + value.getClass());
         }
